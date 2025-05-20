@@ -1,5 +1,5 @@
 {
-  "name": "teste_iot",
+  "name": "smart-home-backend",
   "version": "1.0.0",
   "description": "Backend para Painel Casa Inteligente",
   "main": "server.js",
@@ -7,8 +7,8 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.17.1",
     "axios": "^1.6.0",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
   }
 }
