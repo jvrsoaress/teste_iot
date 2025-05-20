@@ -1,151 +1,159 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Painel Casa Inteligente</title>
-    <style>
-        body { font-family: Arial; text-align: center; margin: 10px; background-color: #b5e5fb; }
-        h1 { font-size: 40px; }
-        select, button { font-size: 32px; margin: 5px; padding: 5px; }
-        .status { font-size: 32px; margin: 5px; }
-    </style>
-</head>
-<body>
-    <h1>Painel Casa Inteligente</h1>
-    <div>
-        <label for="comodo">Selecione o Cômodo:</label>
-        <select id="comodo">
-            <option value="QUARTO_1">Quarto 1</option>
-            <option value="QUARTO_2">Quarto 2</option>
-            <option value="COZINHA">Cozinha</option>
-            <option value="BANHEIRO">Banheiro</option>
-        </select>
-        <button onclick="selecionarComodo()">Selecionar</button>
-    </div>
-    <div>
-        <button onclick="ligarLed()">Ligar LED</button>
-        <button onclick="desligarLed()">Desligar LED</button>
-    </div>
-    <div>
-        <label for="cor">Selecione a Cor:</label>
-        <select id="cor">
-            <option value="VERMELHO">Vermelho</option>
-            <option value="VERDE">Verde</option>
-            <option value="AZUL">Azul</option>
-            <option value="AMARELO">Amarelo</option>
-            <option value="CIANO">Ciano</option>
-            <option value="LILAS">Lilás</option>
-        </select>
-        <button onclick="mudarCor()">Mudar Cor</button>
-    </div>
-    <div>
-        <button onclick="desligarEmergencia()">Desligar Emergência</button>
-    </div>
-    <div class="status">
-        <p>Cômodo: <span id="comodo-atual">QUARTO_1</span></p>
-        <p>LED: <span id="led-status">DESLIGADO</span></p>
-        <p>Cor: <span id="cor-atual">VERMELHO</span></p>
-        <p>Temperatura: <span id="temperatura">25.00°C</span></p>
-        <p>Emergência: <span id="emergencia">DESLIGADA</span></p>
-    </div>
-    <script>
-        const backendUrl = 'https://teste-iot.onrender.com';
+     <html lang="pt-BR">
+     <head>
+         <meta charset="UTF-8">
+         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+         <title>Painel Casa Inteligente</title>
+         <style>
+             body {
+                 font-family: Arial, sans-serif;
+                 text-align: center;
+                 margin: 20px;
+                 background-color: #f0f8ff;
+             }
+             h1 {
+                 color: #333;
+             }
+             .container {
+                 max-width: 600px;
+                 margin: auto;
+                 padding: 20px;
+                 background-color: #fff;
+                 border-radius: 10px;
+                 box-shadow: 0 0 10px rgba(0,0,0,0.1);
+             }
+             button, select {
+                 font-size: 18px;
+                 margin: 10px;
+                 padding: 10px 20px;
+                 border: none;
+                 border-radius: 5px;
+                 background-color: #007bff;
+                 color: white;
+                 cursor: pointer;
+             }
+             button:hover, select:hover {
+                 background-color: #0056b3;
+             }
+             p {
+                 font-size: 18px;
+                 margin: 10px 0;
+             }
+         </style>
+     </head>
+     <body>
+         <div class="container">
+             <h1>Painel Casa Inteligente</h1>
+             <button onclick="ligarLed()">Ligar LED</button>
+             <button onclick="desligarLed()">Desligar LED</button>
+             <select id="cor" onchange="mudarCor()">
+                 <option value="VERMELHO">Vermelho</option>
+                 <option value="VERDE">Verde</option>
+                 <option value="AZUL">Azul</option>
+                 <option value="AMARELO">Amarelo</option>
+                 <option value="CIANO">Ciano</option>
+                 <option value="LILAS">Lilás</option>
+             </select>
+             <select id="comodo" onchange="mudarComodo()">
+                 <option value="QUARTO_1">Quarto 1</option>
+                 <option value="QUARTO_2">Quarto 2</option>
+                 <option value="COZINHA">Cozinha</option>
+                 <option value="BANHEIRO">Banheiro</option>
+             </select>
+             <button onclick="desligarEmergencia()">Desligar Emergência</button>
+             <p>LED: <span id="led">DESLIGADO</span></p>
+             <p>Cômodo: <span id="comodo">QUARTO_1</span></p>
+             <p>Cor: <span id="corAtual">VERMELHO</span></p>
+             <p>Temperatura: <span id="temperatura">25.0</span>°C</p>
+             <p>Emergência: <span id="emergencia">DESLIGADA</span></p>
+         </div>
+         <script>
+             const backendUrl = 'https://smart-home-backend.onrender.com';
 
-        async function selecionarComodo() {
-            const comodo = document.getElementById('comodo').value;
-            try {
-                const response = await fetch(`${backendUrl}/update`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ comodo })
-                });
-                const data = await response.json();
-                document.getElementById('comodo-atual').innerText = comodo;
-                alert('Cômodo selecionado: ' + comodo);
-            } catch (error) {
-                alert('Erro ao selecionar cômodo: ' + error);
-            }
-        }
+             async function atualizarEstado() {
+                 try {
+                     const response = await fetch(`${backendUrl}/status`);
+                     const estado = await response.json();
+                     document.getElementById('led').textContent = estado.led;
+                     document.getElementById('comodo').textContent = estado.comodo;
+                     document.getElementById('corAtual').textContent = estado.cor;
+                     document.getElementById('temperatura').textContent = estado.temperatura.toFixed(2);
+                     document.getElementById('emergencia').textContent = estado.emergencia;
+                 } catch (error) {
+                     console.error('Erro ao atualizar estado:', error);
+                 }
+             }
 
-        async function ligarLed() {
-            try {
-                const response = await fetch(`${backendUrl}/update`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ led: 'LIGADO' })
-                });
-                const data = await response.json();
-                document.getElementById('led-status').innerText = 'LIGADO';
-                alert('LED ligado!');
-            } catch (error) {
-                alert('Erro ao ligar LED: ' + error);
-            }
-        }
+             async function ligarLed() {
+                 try {
+                     await fetch(`${backendUrl}/update`, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ led: 'LIGADO' })
+                     });
+                     atualizarEstado();
+                 } catch (error) {
+                     console.error('Erro ao ligar LED:', error);
+                 }
+             }
 
-        async function desligarLed() {
-            try {
-                const response = await fetch(`${backendUrl}/update`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ led: 'DESLIGADO' })
-                });
-                const data = await response.json();
-                document.getElementById('led-status').innerText = 'DESLIGADO';
-                alert('LED desligado!');
-            } catch (error) {
-                alert('Erro ao desligar LED: ' + error);
-            }
-        }
+             async function desligarLed() {
+                 try {
+                     await fetch(`${backendUrl}/update`, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ led: 'DESLIGADO' })
+                     });
+                     atualizarEstado();
+                 } catch (error) {
+                     console.error('Erro ao desligar LED:', error);
+                 }
+             }
 
-        async function mudarCor() {
-            const cor = document.getElementById('cor').value;
-            try {
-                const response = await fetch(`${backendUrl}/update`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ cor })
-                });
-                const data = await response.json();
-                document.getElementById('cor-atual').innerText = cor;
-                alert('Cor alterada para: ' + cor);
-            } catch (error) {
-                alert('Erro ao mudar cor: ' + error);
-            }
-        }
+             async function mudarCor() {
+                 const cor = document.getElementById('cor').value;
+                 try {
+                     await fetch(`${backendUrl}/update`, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ cor })
+                     });
+                     atualizarEstado();
+                 } catch (error) {
+                     console.error('Erro ao mudar cor:', error);
+                 }
+             }
 
-        async function desligarEmergencia() {
-            try {
-                const response = await fetch(`${backendUrl}/update`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ emergencia: 'DESLIGADA' })
-                });
-                const data = await response.json();
-                document.getElementById('emergencia').innerText = 'DESLIGADA';
-                alert('Emergência desligada!');
-            } catch (error) {
-                alert('Erro ao desligar emergência: ' + error);
-            }
-        }
+             async function mudarComodo() {
+                 const comodo = document.getElementById('comodo').value;
+                 try {
+                     await fetch(`${backendUrl}/update`, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ comodo })
+                     });
+                     atualizarEstado();
+                 } catch (error) {
+                     console.error('Erro ao mudar cômodo:', error);
+                 }
+             }
 
-        // Função para atualizar status periodicamente
-        async function atualizarStatus() {
-            try {
-                const response = await fetch(`${backendUrl}/comando`);
-                const estado = await response.json();
-                document.getElementById('comodo-atual').innerText = estado.comodo;
-                document.getElementById('led-status').innerText = estado.led;
-                document.getElementById('cor-atual').innerText = estado.cor;
-                document.getElementById('temperatura').innerText = estado.temperatura.toFixed(2) + '°C';
-                document.getElementById('emergencia').innerText = estado.emergencia;
-            } catch (error) {
-                console.error('Erro ao atualizar status:', error);
-            }
-        }
+             async function desligarEmergencia() {
+                 try {
+                     await fetch(`${backendUrl}/update`, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ emergencia: 'DESLIGADA' })
+                     });
+                     atualizarEstado();
+                 } catch (error) {
+                     console.error('Erro ao desligar emergência:', error);
+                 }
+             }
 
-        // Atualiza status a cada 5 segundos
-        setInterval(atualizarStatus, 5000);
-        atualizarStatus(); // Chama ao carregar
-    </script>
-</body>
-</html>
+             // Atualiza estado inicial e a cada 5 segundos
+             atualizarEstado();
+             setInterval(atualizarEstado, 5000);
+         </script>
+     </body>
+     </html>
