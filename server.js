@@ -1,5 +1,6 @@
 const express = require('express');
 const axios = require('axios');
+const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -7,6 +8,7 @@ const port = process.env.PORT || 3000;
 const PICO_IP = 'http://192.168.x.x'; // Atualize com o IP real do Pico W
 
 app.use(express.json());
+app.use(cors()); // Habilita CORS para todas as origens
 
 let estado = {
     led: 'DESLIGADO',
